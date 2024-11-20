@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Game for You</title>
+  <style>
+    body {
+      font-family: 'Arial', sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      margin: 0;
+      background: linear-gradient(45deg, #ff7f7f, #5fe7ff);
+      animation: gradientShift 10s infinite alternate;
+    }
+
+    /* Gradient animation for background */
+    @keyframes gradientShift {
+      0% {
+        background: linear-gradient(45deg, #ff7f7f, #5fe7ff);
+      }
+      100% {
+        background: linear-gradient(45deg, #5fe7ff, #ff7f7f);
+      }
+      100% {
+        background: linear-gradient(45deg, #d454ff, #ff72ea);
+      }
+    }
+    h1 {
+      color: #020202;
+      font-size: 2rem;
+      margin-bottom: 20px;
+      text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+    }
+
+    .game-area {
+      position: relative;
+      width: 300px;
+      height: 300px;
+      background: #e0f7fa;
+      border: 2px solid #0288d1;
+      border-radius: 10px;
+      margin-bottom: 20px;
+      overflow: hidden;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+      transition: transform 0.3s ease;
+    }
+
+    /* Hover effect on game area */
+    .game-area:hover {
+      transform: scale(1.05);
+    }
+
+    .target {
+      position: absolute;
+      width: 40px;
+      height: 40px;
+      background-color: #da274e;
+      border-radius: 50%;
+      cursor: pointer;
+      animation: wiggle 1s infinite ease-in-out;
+    }
+
+    /* Wiggle animation for slight movement */
+    @keyframes wiggle {
+      0%, 100% {
+        transform: translate(0, 0);
+      }
+      25% {
+        transform: translate(3px, 2px);
+      }
+      50% {
+        transform: translate(-3px, -2px);
+      }
+      75% {
+        transform: translate(2px, -3px);
+      }
+    }
+
+    /* Modal styles */
+    .modal {
+      display: none; /* Hidden by default */
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(255, 43, 237, 0.8);
+      justify-content: center;
+      align-items: center;
+      z-index: 1000;
+    }
+
+    .modal-content {
+      background: rgb(218, 74, 168);
+      padding: 30px;
+      border-radius: 20px;
+      width: 80%;
+      max-width: 600px;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+      text-align: center;
+      color: #000000;
+      position: relative;
+      font-size: 2rem;
+      overflow: hidden;
+      background-color: #f4e0e9;
+    }
+
+    /* Heart background for apology message */
+    .blurred-message {
+      margin: 20px 0;
+      padding: 20px;
+      background: rgba(255, 0, 0, 0.1); /* Light red */
+      border: 1px solid #dee2e6;
+      border-radius: 10px;
+      font-size: 1.2rem;
+      text-align: center;
+      color: #000000;
+      filter: blur(10px);
+      position: relative;
+      transition: filter 0.1s ease-in-out;
+      overflow: hidden;
+    }
+
+    /* Random heart background and heartbeat animation */
+    .heart {
+      position: absolute;
+      font-size: 50px;
+      color: rgba(255, 0, 0, 0.2); /* Light red with opacity */
+      animation: heartbeat 1.5s ease-in-out infinite;
+      pointer-events: none; /* Ignore pointer events on hearts */
+    }
+
+    /* Heartbeat animation for hearts */
+    @keyframes heartbeat {
+      0%, 100% {
+        transform: scale(1);
+      }
+      50% {
+        transform: scale(1.5); /* Heart scaling effect */
+      }
+    }
+
+    .slider-container {
+      display: flex;
+      align-items: center;
+      flex-direction: column;
+    }
+
+    .slider {
+      width: 300px;
+      margin-top: 10px;
+    }
+
+    .slider-label {
+      font-size: 1rem;
+      margin-top: 10px;
+      color: #000000;
+    }
+
+    .close-btn {
+      padding: 10px 20px;
+      font-size: 1rem;
+      background-color: #dc3545;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      margin-top: 20px;
+      transition: background-color 0.3s ease;
+    }
+
+    .close-btn:hover {
+      background-color: #c82333;
+    }
+
+    /* Add a glowing effect to the button when hovered */
+    .close-btn:active {
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+    }
+  </style>
+</head>
+<body>
+
+  <h1>A Small Game for You</h1> 
+  <h1> Click on the red ball</h1>
+  <div class="game-area" id="gameArea">
+    <div class="target" id="target"></div>
+  </div>
+
+  <!-- Popup Modal -->
+  <div class="modal" id="apologyModal">
+    <div class="modal-content">
+      <p>Congratulations Mag! You've won the game 🎉</p>
+      <div class="blurred-message" id="apologyMessage">
+        Dear Mag, I’m so sorry for the pain I’ve caused you. Hurting you is the last thing I’d ever want to do, and it breaks my heart knowing I did. You’re incredibly important to me, and I value our friendship more than words can say. 
+        Please forgive me—I promise to do better and to never take you for granted again. You mean the world to me, and I’ll do everything I can to make things right. 💕
+      </div>
+      <div class="slider-container">
+        <label for="blurSlider" class="slider-label">Drag to adjust the message clarity: (Drag Slowly) </label>
+        <input type="range" id="blurSlider" class="slider" min="0" max="10" value="10" step="0.1">
+      </div>
+      <button class="close-btn" id="closeModal">Close</button>
+    </div>
+  </div>
+
+  <script>
+    const apologyModal = document.getElementById('apologyModal');
+    const apologyMessage = document.getElementById('apologyMessage');
+    const blurSlider = document.getElementById('blurSlider');
+    const closeModal = document.getElementById('closeModal');
+    const target = document.getElementById('target');
+    const gameArea = document.getElementById('gameArea');
+
+    let score = 0;
+    const maxScore = 5; // Number of clicks to win
+
+    // Randomly position the target within the game area
+    function moveTarget() {
+      const areaWidth = gameArea.clientWidth;
+      const areaHeight = gameArea.clientHeight;
+      const targetSize = target.clientWidth;
+
+      const x = Math.random() * (areaWidth - targetSize);
+      const y = Math.random() * (areaHeight - targetSize);
+
+      target.style.left = `${x}px`;
+      target.style.top = `${y}px`;
+    }
+
+    // Show the modal when the game is won
+    function showModal() {
+      apologyModal.style.display = 'flex';
+      generateHearts(); // Generate random hearts on modal open
+    }
+
+    // Game mechanics
+    target.addEventListener('click', () => {
+      score += 1;
+      if (score >= maxScore) {
+        showModal();
+      } else {
+        moveTarget();
+      }
+    });
+
+    // Adjust the blur effect based on the slider's value
+    blurSlider.addEventListener('input', () => {
+      const blurValue = blurSlider.value; // Get the current slider value
+      apologyMessage.style.filter = `blur(${blurValue}px)`;
+    });
+
+    // Close the modal when the "Close" button is clicked
+    closeModal.addEventListener('click', () => {
+      apologyModal.style.display = 'none';
+      score = 0; // Reset the game
+      moveTarget(); // Restart the target
+    });
+
+    // Close the modal when clicking outside the modal content
+    window.addEventListener('click', (event) => {
+      if (event.target === apologyModal) {
+        apologyModal.style.display = 'none';
+        score = 0; // Reset the game
+        moveTarget(); // Restart the target
+      }
+    });
+
+    // Function to generate random hearts inside the message box
+    function generateHearts() {
+      const heartCount = 10;
+      const messageBox = document.getElementById('apologyMessage');
+      
+      for (let i = 0; i < heartCount; i++) {
+        const heart = document.createElement('div');
+        heart.classList.add('heart');
+        heart.textContent = '❤️';
+        
+        // Randomly position hearts within the box
+        heart.style.top = `${Math.random() * 80}%`;
+        heart.style.left = `${Math.random() * 80}%`;
+
+        // Append heart to the message box
+        messageBox.appendChild(heart);
+      }
+    }
+
+    // Initialize the target position
+    moveTarget();
+  </script>
+
+</body>
+</html>
